@@ -2,126 +2,187 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
+/**
+ * DNAPopupCTALite (enhanced)
+ * - Mobile-first typography and spacing
+ * - Proper tap targets (44px), larger close button
+ * - Body scroll lock when modal open (avoids background scroll on iOS/Android)
+ * - Escape/backdrop to close, focus handling for a11y
+ * - Session frequency cap via sessionStorage/localStorage
+ * - Responsive image sizing (no CLS), smaller on small screens
+ * - Safe gradients & contrast for readability
+ */
 export function DNAPopupCTALite({
-  delayMs = 5000,
+  delayMs = 3000, // Slightly shorter on mobile to catch attention fast
   ctaHref = "/collection",
+  storageKey = "dna_popup_seen_today", // change per-campaign
+  frequency: _frequency = "session", // "session" | "daily" | "always"
 }: {
   delayMs?: number;
   ctaHref?: string;
+  storageKey?: string;
+  frequency?: "session" | "daily" | "always";
 }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const lastActiveEl = useRef<HTMLElement | null>(null);
 
+  // Frequency cap: don't show if already seen in session/day
   useEffect(() => {
+    if (_frequency === "always") return; // always show (for testing)
+
+    const now = new Date();
+    if (_frequency === "session") {
+      if (sessionStorage.getItem(storageKey)) return; // already seen
+    } else if (_frequency === "daily") {
+      const stamped = localStorage.getItem(storageKey);
+      if (stamped && new Date(stamped).toDateString() === now.toDateString()) return;
+    }
+
     const t = setTimeout(() => {
+      lastActiveEl.current = document.activeElement as HTMLElement | null;
       setOpen(true);
     }, Math.max(0, delayMs));
-    return () => clearTimeout(t);
-  }, [delayMs]);
 
+    return () => clearTimeout(t);
+  }, [delayMs, storageKey, _frequency]);
+
+  // Close helpers
+  const close = () => {
+    setOpen(false);
+    // restore focus
+    setTimeout(() => {
+      lastActiveEl.current?.focus?.();
+    }, 0);
+  };
+
+  // Esc to close + lock background scroll
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+
+    // lock scroll (supports iOS Safari)
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+
+    // focus first focusable element inside dialog
+    const focusTarget = dialogRef.current?.querySelector<HTMLElement>(
+      'a,button,[href],[tabindex]:not([tabindex="-1"])'
+    );
+    focusTarget?.focus();
+
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+    };
   }, [open]);
+
+  // Mark as seen when opened (after animation frame)
+  useEffect(() => {
+    if (!open) return;
+    if (_frequency === "session") {
+      sessionStorage.setItem(storageKey, "1");
+    } else if (_frequency === "daily") {
+      localStorage.setItem(storageKey, new Date().toISOString());
+    }
+  }, [open, storageKey, _frequency]);
 
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
+      aria-hidden={!open}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-3 sm:p-4"
       onMouseDown={(e) => {
-        if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        if (dialogRef.current && !dialogRef.current.contains(e.target as Node)) close();
       }}
     >
       <div
-        ref={ref}
-        className="relative w-[min(940px,calc(100vw-32px))] rounded-3xl bg-gradient-to-b from-zinc-900 to-zinc-950 p-6 sm:p-10 text-zinc-50 shadow-2xl"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Specijalna ponuda"
+        className="relative w-full max-w-[680px] rounded-3xl bg-gradient-to-b from-zinc-900 to-zinc-950 text-zinc-50 shadow-2xl outline-none"
       >
+        {/* Close button */}
         <button
-          onClick={() => setOpen(false)}
+          onClick={close}
           aria-label="Zatvori"
-          className="absolute right-3 top-3 h-10 w-10 rounded-full text-zinc-400 hover:bg-white/5 hover:text-white"
+          className="absolute right-2 top-2 sm:right-3 sm:top-3 grid h-11 w-11 place-items-center rounded-full text-zinc-300 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/40"
         >
-          ×
+          <span className="text-2xl leading-none">×</span>
         </button>
 
-        {/* Glavni sadržaj centriran */}
-        <div className="flex flex-col items-center text-center">
-          <p className="text-zinc-300 font-satoshi text-lg sm:text-xl">
-            Hoćeš da propustiš Balmain majicu za 2400 RSD?
-          </p>
-          <h2 className="mt-1 text-3xl sm:text-5xl md:text-6xl font-extrabold font-frances tracking-tight">
-            <span role="img" aria-label="vatra">
-              🔥
-            </span>{" "}
-            Naravno da nećeš!!!
-          </h2>
+        {/* Content */}
+        <div className="px-4 pb-4 pt-10 sm:px-8 sm:pt-12 sm:pb-8">
+          <div className="flex flex-col items-center text-center">
+            <p className="text-zinc-300 font-satoshi text-base sm:text-lg">
+              Hoćeš da propustiš Balmain majicu za 2400 RSD?
+            </p>
+            <h2 className="mt-1 text-2xl sm:text-4xl md:text-5xl font-extrabold font-frances tracking-tight">
+              <span role="img" aria-label="vatra">🔥</span> Naravno da nećeš!!!
+            </h2>
 
-          {/* Slika proizvoda */}
-          <div className="mt-6 flex justify-center">
-            <Image
-              src="/products/popup.png"
-              alt="Balmain majica"
-              width={280}
-              height={320}
-              className="rounded-2xl shadow-lg object-contain"
-              priority
-            />
+            {/* Image */}
+            <div className="mt-5 sm:mt-6 flex justify-center">
+              <Image
+                src="/products/popup.png"
+                alt="Balmain majica"
+                width={320}
+                height={380}
+                sizes="(max-width: 640px) 70vw, 320px"
+                className="rounded-2xl shadow-lg object-contain w-[min(70vw,320px)] h-auto"
+                priority
+              />
+            </div>
+
+            {/* CTA */}
+            <Link
+              href={ctaHref}
+              className="mt-6 sm:mt-8 inline-flex w-full sm:w-auto items-center justify-center rounded-2xl px-6 sm:px-8 py-4 text-lg sm:text-xl font-satoshi font-semibold text-white bg-gradient-to-r from-amber-700 to-purple-500 shadow-lg hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-white/40 active:scale-[0.99]"
+            >
+              Pogledaj kolekciju
+            </Link>
           </div>
 
-          {/* CTA dugme */}
-          <a
-            href={ctaHref}
-            className="mt-8 inline-flex w-full sm:w-auto items-center justify-center rounded-2xl px-8 py-4 text-xl font-satoshi font-semibold text-white bg-gradient-to-r from-amber-700 to-purple-500 shadow-lg hover:opacity-95"
-          >
-            Pogledaj kolekciju
-          </a>
-        </div>
-
-        {/* Benefiti (ostaju u gridu levo/desno) */}
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <Perk
-            title="Isporuka"
-            sub="48h MAX"
-            icon={
-              <svg
-                viewBox="0 0 24 24"
-                className="h-10 w-10 fill-current opacity-90"
-                aria-hidden
-              >
-                <path d="M3 7l9 4 9-4-9-4-9 4zm0 3v7l9 4V14L3 10zm20 0l-9 4v7l9-4v-7z" />
-              </svg>
-            }
-          />
-          <Perk
-            title="Zamena"
-            sub="FREE"
-            icon={
-              <svg
-                viewBox="0 0 24 24"
-                className="h-10 w-10 fill-current opacity-90"
-                aria-hidden
-              >
-                <path d="M7 7h7V4l5 5-5 5v-3H7V7zm10 10H10v3l-5-5 5-5v3h7v4z" />
-              </svg>
-            }
-          />
-          <Perk
-            title="Garancija"
-            sub="100%"
-            icon={
-              <svg
-                viewBox="0 0 24 24"
-                className="h-10 w-10 fill-current opacity-90"
-                aria-hidden
-              >
-                <path d="M18 4V2H6v2H3v3c0 2.8 2.2 5 5 5 .9 1.2 2.2 2 3.7 2H12c1.5 0 2.8-.8 3.7-2 2.8 0 5-2.2 5-5V4h-2zM5 7V6h1V5h1v3c0 .7.1 1.3.4 1.9C6 9.6 5 8.4 5 7zm14 0c0 1.4-1 2.6-2.4 2.9.3-.6.4-1.2.4-1.9V5h1v1h1v1zM8 14h8c0 1.8-1.2 3.3-3 3.8V20h2v2H9v-2h2v-2.2c-1.8-.5-3-2-3-3.8z" />
-              </svg>
-            }
-          />
+          {/* Perks grid */}
+          <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
+            <Perk
+              title="Isporuka"
+              sub="48h MAX"
+              icon={
+                <svg viewBox="0 0 24 24" className="h-8 w-8 sm:h-10 sm:w-10 fill-current opacity-90" aria-hidden>
+                  <path d="M3 7l9 4 9-4-9-4-9 4zm0 3v7l9 4V14L3 10zm20 0l-9 4v7l9-4v-7z" />
+                </svg>
+              }
+            />
+            <Perk
+              title="Zamena"
+              sub="FREE"
+              icon={
+                <svg viewBox="0 0 24 24" className="h-8 w-8 sm:h-10 sm:w-10 fill-current opacity-90" aria-hidden>
+                  <path d="M7 7h7V4l5 5-5 5v-3H7V7zm10 10H10v3l-5-5 5-5v3h7v4z" />
+                </svg>
+              }
+            />
+            <Perk
+              title="Garancija"
+              sub="100%"
+              icon={
+                <svg viewBox="0 0 24 24" className="h-8 w-8 sm:h-10 sm:w-10 fill-current opacity-90" aria-hidden>
+                  <path d="M18 4V2H6v2H3v3c0 2.8 2.2 5 5 5 .9 1.2 2.2 2 3.7 2H12c1.5 0 2.8-.8 3.7-2 2.8 0 5-2.2 5-5V4h-2zM5 7V6h1V5h1v3c0 .7.1 1.3.4 1.9C6 9.6 5 8.4 5 7zm14 0c0 1.4-1 2.6-2.4 2.9.3-.6.4-1.2.4-1.9V5h1v1h1v1zM8 14h8c0 1.8-1.2 3.3-3 3.8V20h2v2H9v-2h2v-2.2c-1.8-.5-3-2-3-3.8z" />
+                </svg>
+              }
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -138,13 +199,11 @@ function Perk({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl bg-white/5 p-4">
-      <div className="text-amber-400">{icon}</div>
+    <div className="flex items-center gap-3 sm:gap-4 rounded-2xl bg-white/5 p-3 sm:p-4">
+      <div className="text-amber-400 shrink-0">{icon}</div>
       <div>
-        <div className="text-sm text-zinc-300">{title}</div>
-        <div className="text-2xl font-frances font-extrabold tracking-tight">
-          {sub}
-        </div>
+        <div className="text-xs sm:text-sm text-zinc-300">{title}</div>
+        <div className="text-xl sm:text-2xl font-frances font-extrabold tracking-tight">{sub}</div>
       </div>
     </div>
   );
