@@ -5,19 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 /**
- * DNAPopupCTALite (enhanced)
- * - Mobile-first typography and spacing
- * - Proper tap targets (44px), larger close button
- * - Body scroll lock when modal open (avoids background scroll on iOS/Android)
- * - Escape/backdrop to close, focus handling for a11y
- * - Session frequency cap via sessionStorage/localStorage
- * - Responsive image sizing (no CLS), smaller on small screens
- * - Safe gradients & contrast for readability
+ * DNAPopupCTALite (enhanced, mobile-safe)
+ * - Mobile-first: overlay se scroll-uje, dialog ima max-h i unutrašnji scroll
+ * - Sticky "×" da je uvek dostupan
+ * - Body scroll lock dok je otvoren (iOS/Android)
+ * - Escape/backdrop to close, vraćanje fokusa
+ * - Frequency cap: session/daily
+ * - Responsive image sizing bez CLS
  */
 export function DNAPopupCTALite({
-  delayMs = 3000, // Slightly shorter on mobile to catch attention fast
+  delayMs = 3000,
   ctaHref = "/collection",
-  storageKey = "dna_popup_seen_today", // change per-campaign
+  storageKey = "dna_popup_seen_today",
   frequency: _frequency = "session", // "session" | "daily" | "always"
 }: {
   delayMs?: number;
@@ -27,52 +26,47 @@ export function DNAPopupCTALite({
 }) {
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const scrimRef = useRef<HTMLDivElement | null>(null);
   const lastActiveEl = useRef<HTMLElement | null>(null);
 
-  // Frequency cap: don't show if already seen in session/day
+  // Frequency cap + odloženo otvaranje
   useEffect(() => {
-    if (_frequency === "always") return; // always show (for testing)
-
-    const now = new Date();
-    if (_frequency === "session") {
-      if (sessionStorage.getItem(storageKey)) return; // already seen
-    } else if (_frequency === "daily") {
-      const stamped = localStorage.getItem(storageKey);
-      if (stamped && new Date(stamped).toDateString() === now.toDateString()) return;
+    if (_frequency !== "always") {
+      const now = new Date();
+      if (_frequency === "session" && sessionStorage.getItem(storageKey)) return;
+      if (_frequency === "daily") {
+        const stamped = localStorage.getItem(storageKey);
+        if (stamped && new Date(stamped).toDateString() === now.toDateString()) return;
+      }
     }
-
     const t = setTimeout(() => {
       lastActiveEl.current = document.activeElement as HTMLElement | null;
       setOpen(true);
     }, Math.max(0, delayMs));
-
     return () => clearTimeout(t);
   }, [delayMs, storageKey, _frequency]);
 
-  // Close helpers
   const close = () => {
     setOpen(false);
     // restore focus
-    setTimeout(() => {
-      lastActiveEl.current?.focus?.();
-    }, 0);
+    setTimeout(() => lastActiveEl.current?.focus?.(), 0);
   };
 
-  // Esc to close + lock background scroll
+  // ESC + body scroll lock
   useEffect(() => {
     if (!open) return;
 
-    // lock scroll (supports iOS Safari)
+    // lock body scroll (radi i na iOS)
     const originalOverflow = document.body.style.overflow;
     const originalPaddingRight = document.body.style.paddingRight;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = "hidden";
-    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+    if (scrollbarW > 0) document.body.style.paddingRight = `${scrollbarW}px`;
 
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     document.addEventListener("keydown", onKey);
 
-    // focus first focusable element inside dialog
+    // fokus prvi fokusabilan element
     const focusTarget = dialogRef.current?.querySelector<HTMLElement>(
       'a,button,[href],[tabindex]:not([tabindex="-1"])'
     );
@@ -85,7 +79,7 @@ export function DNAPopupCTALite({
     };
   }, [open]);
 
-  // Mark as seen when opened (after animation frame)
+  // Mark as seen kada se otvori
   useEffect(() => {
     if (!open) return;
     if (_frequency === "session") {
@@ -99,10 +93,14 @@ export function DNAPopupCTALite({
 
   return (
     <div
+      ref={scrimRef}
       aria-hidden={!open}
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-3 sm:p-4"
+      // Poravnanje gore na mobilu + scroll; centrirano tek od sm:
+      className="fixed inset-0 z-[9999] flex items-start sm:items-center justify-center
+                 bg-black/60 p-3 sm:p-4 overflow-y-auto overscroll-contain"
+      // Klik na pozadinu zatvara (target mora biti overlay, ne unutrašnjost)
       onMouseDown={(e) => {
-        if (dialogRef.current && !dialogRef.current.contains(e.target as Node)) close();
+        if (e.target === scrimRef.current) close();
       }}
     >
       <div
@@ -110,19 +108,29 @@ export function DNAPopupCTALite({
         role="dialog"
         aria-modal="true"
         aria-label="Specijalna ponuda"
-        className="relative w-full max-w-[680px] rounded-3xl bg-gradient-to-b from-zinc-900 to-zinc-950 text-zinc-50 shadow-2xl outline-none"
+        // max-h u odnosu na 100dvh; unutrašnji scroll; blage margine
+        className="relative w-full max-w-[680px]
+                   my-4 sm:my-6 rounded-2xl sm:rounded-3xl
+                   bg-gradient-to-b from-zinc-900 to-zinc-950 text-zinc-50
+                   shadow-2xl outline-none
+                   max-h-[calc(100dvh-2rem)] overflow-y-auto"
       >
-        {/* Close button */}
-        <button
-          onClick={close}
-          aria-label="Zatvori"
-          className="absolute right-2 top-2 sm:right-3 sm:top-3 grid h-11 w-11 place-items-center rounded-full text-zinc-300 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/40"
-        >
-          <span className="text-2xl leading-none">×</span>
-        </button>
+        {/* Sticky header sa × uvek vidljivim */}
+        <div className="sticky top-0 z-10 flex justify-end p-2 sm:p-3
+                        bg-gradient-to-b from-zinc-900 to-transparent">
+          <button
+            onClick={close}
+            aria-label="Zatvori"
+            className="grid h-11 w-11 place-items-center rounded-full text-zinc-300
+                       hover:bg-white/10 hover:text-white focus:outline-none
+                       focus:ring-2 focus:ring-white/40"
+          >
+            <span className="text-2xl leading-none">×</span>
+          </button>
+        </div>
 
         {/* Content */}
-        <div className="px-4 pb-4 pt-10 sm:px-8 sm:pt-12 sm:pb-8">
+        <div className="px-4 pb-4 pt-2 sm:px-8 sm:pt-2 sm:pb-8">
           <div className="flex flex-col items-center text-center">
             <p className="text-zinc-300 font-satoshi text-base sm:text-lg">
               Hoćeš da propustiš Balmain majicu za 2400 RSD?
@@ -147,7 +155,11 @@ export function DNAPopupCTALite({
             {/* CTA */}
             <Link
               href={ctaHref}
-              className="mt-6 sm:mt-8 inline-flex w-full sm:w-auto items-center justify-center rounded-2xl px-6 sm:px-8 py-4 text-lg sm:text-xl font-satoshi font-semibold text-white bg-gradient-to-r from-amber-700 to-purple-500 shadow-lg hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-white/40 active:scale-[0.99]"
+              className="mt-6 sm:mt-8 inline-flex w-full sm:w-auto items-center justify-center
+                         rounded-2xl px-6 sm:px-8 py-4 text-lg sm:text-xl font-satoshi font-semibold
+                         text-white bg-gradient-to-r from-amber-700 to-purple-500
+                         shadow-lg hover:opacity-95 focus:outline-none focus:ring-2
+                         focus:ring-white/40 active:scale-[0.99]"
             >
               Pogledaj kolekciju
             </Link>

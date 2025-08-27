@@ -71,18 +71,23 @@ export default function CartModal({
   if (!open) return null;
 
   return (
-    <div
-      ref={scrimRef}
-      onMouseDown={onScrim}
-      className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-[1px] font-satoshi"
-      aria-hidden={!open}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cart-title"
-        className="mx-auto mt-6 md:mt-10 max-w-5xl rounded-2xl bg-[#0f0f0d] text-neutral-100 shadow-[0_20px_60px_rgba(0,0,0,.6)] border border-neutral-800 overflow-hidden"
-      >
+     <div
+   ref={scrimRef}
+   onMouseDown={onScrim}
+   className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-[1px] font-satoshi
+              overflow-y-auto overscroll-contain"
+   aria-hidden={!open}
+ >
+     <div
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cart-title"
+  className="mx-auto my-4 md:my-10 max-w-5xl md:rounded-2xl
+             bg-[#0f0f0d] text-neutral-100 shadow-[0_20px_60px_rgba(0,0,0,.6)]
+             border border-neutral-800
+             h-[calc(100dvh-2rem)] md:h-auto
+             overflow-y-auto"
+>
         {/* Header */}
         <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-neutral-800 bg-[#11110f]">
           <h3 id="cart-title" className="font-display font-frances text-xl md:text-2xl font-bold tracking-tight">
@@ -110,7 +115,7 @@ export default function CartModal({
               </div>
             </div>
 
-            <div className="max-h-[55vh] md:max-h-[62vh] overflow-y-auto px-5 pb-5 md:pb-0 md:pr-3 mt-3 space-y-3">
+<div className="md:max-h-[62vh] md:overflow-y-auto px-5 pb-5 md:pb-0 md:pr-3 mt-3 space-y-3">
               {items.map((it) => {
                 const lineTotal = it.price * it.qty;
                 const discount =
@@ -123,7 +128,7 @@ export default function CartModal({
                     key={`${it.id}-${it.size ?? "UNI"}`}
                     className="flex items-stretch gap-4 rounded-xl border border-neutral-800 p-4 bg-[#121211]"
                   >
-                    <div className="relative h-20 w-20 shrink-0 rounded-lg overflow-hidden border border-neutral-700">
+                    <div className="relative h-16 w-16 shrink-0 rounded-lg overflow-hidden border border-neutral-700">
                       {discount > 0 && (
                         <span className="absolute left-1 top-1 z-10 rounded-md bg-[#f0b33a] px-1.5 py-0.5 text-[10px] font-semibold text-[#151511]">
                           -{discount}%
