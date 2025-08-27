@@ -147,11 +147,11 @@ export default function CartModal({
                           <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
   {/* VELIČINA — dropdown koji se otvara na klik */}
   <label className="inline-flex items-center gap-2">
-    <span className="sr-only">Veličina</span>
+    <span className="sr-only ">Veličina</span>
     <select
   value={it.size ?? getSizesForProduct(it.id)[0]}
   onChange={(e) => onChangeSize?.(it.id, it.size ?? "UNI", e.target.value)}
-  className="h-8 rounded-lg border border-neutral-700 bg-[#0f0f0d] px-2.5 hover:border-neutral-400 focus:border-neutral-400 outline-none"
+  className="h-8 rounded-lg border text-xs  border-neutral-700 bg-[#0f0f0d] px-2.5 hover:border-neutral-400 focus:border-neutral-400 outline-none"
   aria-label="Promeni veličinu"
 >
   {getSizesForProduct(it.id).map((s) => (
@@ -161,7 +161,7 @@ export default function CartModal({
 
   </label>
 
-  <span className="inline-flex h-8 items-center rounded-lg border border-neutral-700 px-2.5">
+  <span className="inline-flex h-8 text-xs items-center rounded-lg border border-neutral-700 px-2.5">
     Količina: {it.qty}
   </span>
 </div>

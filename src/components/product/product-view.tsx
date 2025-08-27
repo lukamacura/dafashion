@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useMemo, useEffect, useRef } from "react";
-import { Check, Package, Shield, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, Package, Wallet, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
 import type { Product } from "@/lib/products";
 import { rsd } from "@/lib/products";
@@ -221,7 +221,7 @@ export default function ProductView({ product }: { product: Product }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Shield className="h-6 w-6 text-[#f0b33a]" />
+                    <Wallet className="h-6 w-6 text-[#f0b33a]" />
               <div className="text-sm">
                 <div className="font-medium">Plaćanje pouzećem</div>
                 <div className="text-neutral-400 text-xs">sigurna isporuka</div>

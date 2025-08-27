@@ -1,78 +1,103 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
+  const brands = ["HUGO", "BALMAIN", "DIESEL", "AMIRI"];
+  const [index, setIndex] = useState(0);
+
+  // menja brend na svakih 2.5s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % brands.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [brands.length]);
 
   return (
-    <section className="bg-[#151511] text-neutral-100">
+    <section className="bg-[#151511] text-neutral-100 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 pt-6 pb-12 md:pt-10 md:pb-16">
         <div className="grid md:grid-cols-2 gap-10 items-center">
           {/* LEFT – copy */}
           <div>
-<h1 className="font-frances font-bold text-5xl md:text-6xl leading-[1.05]">
-  Nosi <span className="da-hero-accent">Hugo</span>.<br />
-  Plati trećinu.
-</h1>
+            <h1 className="font-frances font-bold text-5xl md:text-6xl leading-[1.05]">
+              Nosi{" "}
+              <span className="relative inline-block min-w-[7ch] da-hero-accent">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={brands[index]}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute left-0 top-0"
+                  >
+                    {brands[index]}
+                  </motion.span>
+                </AnimatePresence>
+                {/* transparent placeholder da se ne pomera layout */}
+                <span className="invisible">{brands[0]}</span>
+              </span>
+              .<br />
+              Plati trećinu.
+            </h1>
 
-<p className="mt-5 font-satoshi text-neutral-300 text-lg max-w-xl">
-  Markirana garderoba koju svi prepoznaju. Cena koju znaš samo ti.
-</p>
-
-
+            <p className="mt-5 font-satoshi text-neutral-300 text-lg max-w-xl">
+              Markirana garderoba koju svi prepoznaju. Cena koju znaš samo ti.
+            </p>
 
             {/* Social proof */}
-            {/* Social proof */}
-<div className="mt-6 flex items-center gap-3">
-  <AvatarStack />
-  <span className="text-sm text-neutral-300">
-    <strong className="text-neutral-100">3000+</strong> ljudi zadovoljno
-  </span>
-</div>
+            <div className="mt-6 flex items-center gap-3">
+              <AvatarStack />
+              <span className="text-sm text-neutral-300">
+                <strong className="text-neutral-100">3000+</strong> ljudi zadovoljno
+              </span>
+            </div>
 
             {/* CTA */}
             <div className="mt-8">
               <Link
                 href="/collection"
-                className="font-semibold text-white bg-gradient-to-r from-amber-700 to-purple-500 shadow-lg font-satoshi px-12 py-6 rounded-xl  hover:opacity-95 inline-block"
+                className="font-semibold text-white bg-gradient-to-r from-amber-700 to-purple-500 shadow-lg font-satoshi px-12 py-6 rounded-xl hover:opacity-95 inline-block"
               >
                 Pogledaj kolekciju
               </Link>
             </div>
           </div>
 
-          {/* RIGHT – images cluster */}
-         {/* RIGHT – images cluster */}
-      <div className="relative h-[500px] md:h-[580px]">
-        {/* Majice pozadina */}
-        <Image
-          src="/hero/shirt-left.png"
-          alt="AMIRI t-shirt"
-          width={300}
-          height={300}
-          className="absolute left-0 top-16 md:top-[-70] opacity-70 object-contain rotate-[-6deg] z-0"
-          priority
-        />
-        <Image
-          src="/hero/shirt-right.png"
-          alt="HUGO t-shirt"
-          width={320}
-          height={320}
-          className="absolute right-0 top-20 md:top-[-70] opacity-70 object-contain rotate-[6deg] z-0"
-          priority
-        />
-
-        {/* Telefon u prvom planu */}
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          <Image
-            src="/hero/phones.png"
-            alt="Chat dokaz"
-            width={500}
-            height={700}
-            className="object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)] scale-110"
-            priority
-          />
-        </div>
-      </div>
+          {/* RIGHT – images cluster (ostaje tvoj kod) */}
+          <div className="relative h-[500px] md:h-[580px]">
+            <Image
+              src="/hero/shirt-left.png"
+              alt="AMIRI t-shirt"
+              width={300}
+              height={300}
+              className="absolute left-0 top-16 md:top-[-70] opacity-70 object-contain rotate-[-6deg] z-0"
+              priority
+            />
+            <Image
+              src="/hero/shirt-right.png"
+              alt="HUGO t-shirt"
+              width={320}
+              height={320}
+              className="absolute right-0 top-20 md:top-[-70] opacity-70 object-contain rotate-[6deg] z-0"
+              priority
+            />
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <Image
+                src="/hero/phones.png"
+                alt="Chat dokaz"
+                width={500}
+                height={700}
+                className="object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)] scale-110"
+                priority
+              />
+            </div>
+          </div>
+ 
 
         </div>
 
