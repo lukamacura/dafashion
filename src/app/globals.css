@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* underline akcenat + dugme */
+.da-hero-accent{ position:relative; white-space:nowrap; }
+.da-hero-accent::after{
+  content:""; position:absolute; left:.1em; right:.1em; bottom:-.06em; height:.16em;
+  background:linear-gradient(90deg,#9C6615 0%,#8A80AD 100%); transform:rotate(-3deg);
+  border-radius:999px; opacity:.9;
+}
+.btn-gradient{ background:linear-gradient(90deg,#9C6615 30%,#8A80AD 100%); }
+
+/* Local fonts (fajlovi u /public/fonts/) */
+@layer utilities {
+  .font-frances { font-family: var(--font-fraunces), serif; }
+  .font-satoshi    { font-family: var(--font-satoshi), system-ui, sans-serif; }
+}
+html {
+  scroll-behavior: smooth;
+}
