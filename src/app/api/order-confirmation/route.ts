@@ -114,12 +114,14 @@ const { orderId, customer, items, total } = raw as OrderPayload;
     });
 
     const { error } = await resend.emails.send({
-      from: process.env.MAIL_FROM ?? "D&A Fashion <onboarding@resend.dev>",
-      to: ["luka.xzy@gmail.com"], // kasnije: [customer.email]
-      subject: `Potvrda porudžbine #${orderId} – D&A Fashion`,
-      html,
-      // bcc: ["orders@dandafashion.rs"], // uključi ako želiš admin kopiju
-    });
+  from: process.env.MAIL_FROM ?? "D&A Fashion <onboarding@resend.dev>",
+  to: [customer.email],                 // kupac
+  bcc: ["luka.xzy@gmail.com"],          // admin kopija (isti mejl)
+  subject: `Potvrda porudžbine #${orderId} – D&A Fashion`,
+  html,
+  // reply_to: ["orders@dandafashion.rs"], // opciono da ti stigne odgovor
+});
+
 
     if (error) {
       // nema 'any' u catch-u

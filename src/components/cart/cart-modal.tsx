@@ -1,8 +1,9 @@
 "use client";
 
 
+
 import * as React from "react"; // ⬅️ dodaj ovo
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { X, Package, Wallet, Plus, Minus } from "lucide-react";
 import { getProduct } from "@/lib/products";
@@ -39,6 +40,16 @@ export default function CartModal({
 }) 
  { 
 
+const [form, setForm] = useState({
+  name: "",
+  email: "",
+  address: "",
+  city: "",
+  phone: "",
+  payment: "Pouzećem" as "Pouzećem" | "Kartica", // proširi po potrebi
+});
+
+const [errors, setErrors] = useState<Record<string, string>>({});
 
   // ESC za zatvaranje
   useEffect(() => {
@@ -53,19 +64,40 @@ export default function CartModal({
   const onScrim = (e: React.MouseEvent) => {
     if (e.target === scrimRef.current) onClose();
   };
+const validate = () => {
+  const e: Record<string, string> = {};
+  if (!form.name.trim()) e.name = "Unesite ime i prezime";
+  if (!form.address.trim()) e.address = "Unesite adresu";
+  if (!form.city.trim()) e.city = "Unesite mesto/grad";
+  if (!form.email.trim()) e.email = "Unesite email";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Email nije ispravan";
+  if (!form.phone.trim()) e.phone = "Unesite broj telefona";
+  // jednostavna provera za telefon (po želji):
+  else if (!/^[0-9+()\-.\s]{6,20}$/.test(form.phone)) e.phone = "Telefon nije ispravan";
+  return e;
+};
 
 
-  const handleCheckout = async () => {
+const handleCheckout = async () => {
   try {
+    const v = validate();
+    if (Object.keys(v).length > 0) {
+      setErrors(v);
+      // mali UX hint: skrol do forme
+      document.getElementById("checkout-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
     const orderPayload = {
       orderId: Date.now().toString(),
       customer: {
-        name: "Petar Petrović",        // TODO: veži na formu iz modala
-        email: "petar@mail.com",
-        address: "Beograd, Ulica 123",
-        payment: "Pouzećem",
+        name: form.name,
+        email: form.email,
+        address: `${form.address}, ${form.city}`,
+        payment: form.payment,
+        phone: form.phone,
       },
-      items: items, // iz props-a, sad je u scope-u
+      items: items,
       total: items.reduce((sum: number, it: CartItem) => sum + it.price * it.qty, 0),
     };
 
@@ -83,10 +115,11 @@ export default function CartModal({
       alert("Greška: " + data.error);
     }
   } catch (err) {
-    console.error(err); // da ne bude "defined but never used"
+    console.error(err);
     alert("Došlo je do greške. Pokušajte ponovo.");
   }
 };
+
 
   // 💡 NOVO: ukupna količina (ne broj različitih artikala)
  const totalQty = useMemo(
@@ -315,25 +348,80 @@ const subtotal = useMemo(
 
               {/* Form */}
               <div className="mt-4 md:mt-5 px-5 md:px-0">
-                <form className="space-y-3">
-                  <Input label="Ime i prezime" placeholder="Ime i prezime" />
-                  <Input label="Adresa" placeholder="Ulica i broj" />
-                  <Input label="Mesto / Grad" placeholder="Npr. Beograd" />
-                  <Input label="Broj telefona" placeholder="+381 5555555" type="tel" />
-                </form>
+  <form id="checkout-form" className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+    <Input
+      label="Ime i prezime"
+      placeholder="Ime i prezime"
+      value={form.name}
+      onChange={(e) => { setForm({ ...form, name: e.target.value }); if (errors.name) setErrors({ ...errors, name: "" }); }}
+    />
+    {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
 
-                <button
-                  onClick={handleCheckout}
-                  disabled={items.length === 0}
-                  className="mt-4 w-full btn-gradient text-[#151511] font-bold px-6 py-4 rounded-xl shadow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Potvrdi porudžbinu
-                </button>
+    <Input
+      label="Email"
+      placeholder="npr. kupac@mail.com"
+      type="email"
+      value={form.email}
+      onChange={(e) => { setForm({ ...form, email: e.target.value }); if (errors.email) setErrors({ ...errors, email: "" }); }}
+    />
+    {errors.email && <p className="text-xs text-red-400">{errors.email}</p>}
 
-                <p className="mt-3 text-center text-xs text-neutral-400">
-                  Dostava je besplatna za dve ili više stavki <em>(ukupna količina)</em>, inače {RSD(shippingFee)}.
-                </p>
-              </div>
+    <Input
+      label="Adresa"
+      placeholder="Ulica i broj"
+      value={form.address}
+      onChange={(e) => { setForm({ ...form, address: e.target.value }); if (errors.address) setErrors({ ...errors, address: "" }); }}
+    />
+    {errors.address && <p className="text-xs text-red-400">{errors.address}</p>}
+
+    <Input
+      label="Mesto / Grad"
+      placeholder="Npr. Beograd"
+      value={form.city}
+      onChange={(e) => { setForm({ ...form, city: e.target.value }); if (errors.city) setErrors({ ...errors, city: "" }); }}
+    />
+    {errors.city && <p className="text-xs text-red-400">{errors.city}</p>}
+
+    <Input
+      label="Broj telefona"
+      placeholder="+381 6x xxx xxxx"
+      type="tel"
+      value={form.phone}
+      onChange={(e) => { setForm({ ...form, phone: e.target.value }); if (errors.phone) setErrors({ ...errors, phone: "" }); }}
+    />
+    {errors.phone && <p className="text-xs text-red-400">{errors.phone}</p>}
+
+    {/* Payment opcije (primer) */}
+    <div className="flex gap-3 text-sm">
+      <label className="inline-flex items-center gap-2">
+        <input
+          type="radio"
+          name="payment"
+          checked={form.payment === "Pouzećem"}
+          onChange={() => setForm({ ...form, payment: "Pouzećem" })}
+        />
+        <span>Plaćanje pouzećem</span>
+      </label>
+      <label className="inline-flex items-center gap-2 opacity-60 cursor-not-allowed">
+        <input type="radio" name="payment" disabled />
+        <span>Kartica (uskoro)</span>
+      </label>
+    </div>
+  </form>
+
+  <button
+    onClick={handleCheckout}
+    disabled={items.length === 0}
+    className="mt-4 w-full btn-gradient text-[#151511] font-bold px-6 py-4 rounded-xl shadow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    Potvrdi porudžbinu
+  </button>
+
+  <p className="mt-3 text-center text-xs text-neutral-400">
+    Dostava je besplatna za dve ili više stavki <em>(ukupna količina)</em>, inače {RSD(shippingFee)}.
+  </p>
+</div>
+
             </div>
           </div>
         </div>
