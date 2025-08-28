@@ -119,12 +119,16 @@ export async function POST(req: NextRequest) {
       phone: customer.phone,
     });
 
-    const { error } = await resend.emails.send({
-      from: process.env.MAIL_FROM ?? "D&A Fashion <onboarding@resend.dev>",
-      to: ["luka.xzy@gmail.com"],
-      subject: `Potvrda porudžbine #${orderId} – D&A Fashion`,
-      html,
-    });
+  const recipients = [customer.email].filter(Boolean); // safety
+
+const { error } = await resend.emails.send({
+  from: process.env.MAIL_FROM ?? "D&A Fashion <onboarding@resend.dev>",
+  to: recipients,                 // ➜ KUPAC
+  bcc: ["luka.xzy@gmail.com"],    // ➜ ADMIN KOPIJA
+  subject: `Potvrda porudžbine #${orderId} – D&A Fashion`,
+  html,
+});
+console.log("Sending order email", { to: customer.email, bcc: "luka.xzy@gmail.com", orderId });
 
     if (error) {
       return NextResponse.json({ ok: false, error: toErrorMessage(error) }, { status: 500 });
