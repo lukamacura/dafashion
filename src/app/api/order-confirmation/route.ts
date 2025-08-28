@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
   const recipients = [customer.email].filter(Boolean); // safety
 
 const { error } = await resend.emails.send({
-  from: process.env.MAIL_FROM ?? "D&A Fashion <onboarding@resend.dev>",
+  from: process.env.MAIL_FROM ?? "D&A Fashion <onboarding@dafashion.store>",
   to: recipients,                 // ➜ KUPAC
   bcc: ["luka.xzy@gmail.com"],    // ➜ ADMIN KOPIJA
   subject: `Potvrda porudžbine #${orderId} – D&A Fashion`,
