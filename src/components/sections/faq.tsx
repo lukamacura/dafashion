@@ -6,10 +6,7 @@ type QA = { q: string; a: string };
 type Props = { items?: QA[]; title?: string };
 
 const DEFAULTS: QA[] = [
-  {
-    q: "Da li je garderoba originalna?",
-    a: "Ne prodajemo kopije. Svaki komad dolazi sa svim pratećim etiketama i prolazi našu proveru kvaliteta pre slanja.",
-  },
+  
   {
     q: "Šta ako mi ne odgovara veličina?",
     a: "Zamena je BESPLATNA u roku od 7 dana. Samo nam napiši poruku na Instagram ili Viber i šaljemo drugi broj.",
