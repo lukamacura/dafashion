@@ -1,9 +1,12 @@
 "use client";
 
+
+import * as React from "react"; // ⬅️ dodaj ovo
 import { useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import { X, Package, Wallet, Plus, Minus } from "lucide-react";
-import { getProduct } from "@/lib/products"; // 👈 dodaj
+import { getProduct } from "@/lib/products";
+
 
 export type CartItem = {
   id: string;
@@ -51,16 +54,51 @@ export default function CartModal({
     if (e.target === scrimRef.current) onClose();
   };
 
-  // 💡 NOVO: ukupna količina (ne broj različitih artikala)
-  const totalQty = useMemo(
-    () => items.reduce((sum, it) => sum + it.qty, 0),
-    [items]
-  );
 
-  const subtotal = useMemo(
-    () => items.reduce((sum, it) => sum + it.price * it.qty, 0),
-    [items]
-  );
+  const handleCheckout = async () => {
+  try {
+    const orderPayload = {
+      orderId: Date.now().toString(),
+      customer: {
+        name: "Petar Petrović",        // TODO: veži na formu iz modala
+        email: "petar@mail.com",
+        address: "Beograd, Ulica 123",
+        payment: "Pouzećem",
+      },
+      items: items, // iz props-a, sad je u scope-u
+      total: items.reduce((sum: number, it: CartItem) => sum + it.price * it.qty, 0),
+    };
+
+    const res = await fetch("/api/order-confirmation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderPayload),
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      alert("Porudžbina potvrđena! Proverite email.");
+      // TODO: isprazni korpu ili redirect na /thank-you
+    } else {
+      alert("Greška: " + data.error);
+    }
+  } catch (err) {
+    console.error(err); // da ne bude "defined but never used"
+    alert("Došlo je do greške. Pokušajte ponovo.");
+  }
+};
+
+  // 💡 NOVO: ukupna količina (ne broj različitih artikala)
+ const totalQty = useMemo(
+  () => items.reduce((sum: number, it: CartItem) => sum + it.qty, 0),
+  [items]
+);
+
+const subtotal = useMemo(
+  () => items.reduce((sum: number, it: CartItem) => sum + it.price * it.qty, 0),
+  [items]
+);
+
 
   // 💡 NOVO: besplatna dostava kada je totalQty >= 2 (npr. 2 ista proizvoda)
   const shipping = totalQty >= 2 ? 0 : shippingFee;
@@ -285,6 +323,7 @@ export default function CartModal({
                 </form>
 
                 <button
+                  onClick={handleCheckout}
                   disabled={items.length === 0}
                   className="mt-4 w-full btn-gradient text-[#151511] font-bold px-6 py-4 rounded-xl shadow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -310,6 +349,7 @@ function getSizesForProduct(id: string) {
   const p = getProduct(id);
   return p?.sizes?.length ? p.sizes : ["UNI"];
 }
+
 
 function Input({
   label,

@@ -53,7 +53,7 @@ export default function Hero() {
             <div className="mt-6 flex items-center gap-3">
               <AvatarStack />
               <span className="text-sm text-neutral-300">
-                <strong className="text-neutral-100">3000+</strong> ljudi zadovoljno
+                <strong className="text-neutral-100">3000+</strong> ljudi redovno kupuje iz D&A
               </span>
             </div>
 
