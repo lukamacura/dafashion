@@ -50,7 +50,7 @@ const UNI = ["UNI"];
 
 /* ------------------ HELPERS ------------------ */
 const imgs = (id: string, count: number) =>
-  Array.from({ length: count }, (_, i) => `/products/${id}-${i + 1}.jpg`);
+  Array.from({ length: count }, (_, i) => `/products/${id}-${i + 1}.webp`);
 
 const href = (id: string) => `/products/${id}`;
 
@@ -84,7 +84,7 @@ export const PRODUCTS: Product[] = [
 { id:"hugo-majica-tamna-mali", name:"HUGO majica (crna – pisani logo)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-tamna-mali",2), image:imgs("hugo-majica-tamna-mali",2)[0], href:href("hugo-majica-tamna-mali"), ...M() },
 { id:"hugo-majica-natpis-tamna", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-natpis-tamna",2), image:imgs("hugo-majica-natpis-tamna",2)[0], href:href("hugo-majica-natpis-tamna"), ...M() },
 { id:"hugo-majica-natpis-bela", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-natpis-bela",1), image:imgs("hugo-majica-natpis-bela",1)[0], href:href("hugo-majica-natpis-bela"), ...M() },
-{ id:"hugo-majica-kisa", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:["/products/hugo-majica-kisa-3.jpg","/products/hugo-majica-kisa-4.jpg"], image:"/products/hugo-majica-kisa-3.jpg", href:href("hugo-majica-kisa"), ...M() },
+{ id:"hugo-majica-kisa", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-kisa",2), image:imgs("hugo-majica-kisa",2)[0], href:href("hugo-majica-kisa"), ...M() },
 { id:"hugo-majica", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica",1), image:imgs("hugo-majica",1)[0], href:href("hugo-majica"), ...M() },
 { id:"hugo-majica-big", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-big",1), image:imgs("hugo-majica-big",1)[0], href:href("hugo-majica-big"), ...M() },
 

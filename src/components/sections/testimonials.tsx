@@ -9,15 +9,15 @@ type Testimonial = {
 };
 
 const items: Testimonial[] = [
-  { id: "t1", src: "/testimonials/t1.png", alt: "Razgovor kupca 1" },
-  { id: "t2", src: "/testimonials/t2.png", alt: "Razgovor kupca 2" },
-  { id: "t3", src: "/testimonials/t3.png", alt: "Razgovor kupca 3" },
-  { id: "t4", src: "/testimonials/t4.png", alt: "Razgovor kupca 4" },
-  { id: "t5", src: "/testimonials/t5.png", alt: "Razgovor kupca 5" },
-  { id: "t6", src: "/testimonials/t6.png", alt: "Razgovor kupca 6" },
-  { id: "t7", src: "/testimonials/t7.png", alt: "Razgovor kupca 7" },
-  { id: "t8", src: "/testimonials/t8.png", alt: "Razgovor kupca 8" },
-  { id: "t9", src: "/testimonials/t9.png", alt: "Razgovor kupca 9" },
+  { id: "t1", src: "/testimonials/t1.webp", alt: "Razgovor kupca 1" },
+  { id: "t2", src: "/testimonials/t2.webp", alt: "Razgovor kupca 2" },
+  { id: "t3", src: "/testimonials/t3.webp", alt: "Razgovor kupca 3" },
+  { id: "t4", src: "/testimonials/t4.webp", alt: "Razgovor kupca 4" },
+  { id: "t5", src: "/testimonials/t5.webp", alt: "Razgovor kupca 5" },
+  { id: "t6", src: "/testimonials/t6.webp", alt: "Razgovor kupca 6" },
+  { id: "t7", src: "/testimonials/t7.webp", alt: "Razgovor kupca 7" },
+  { id: "t8", src: "/testimonials/t8.webp", alt: "Razgovor kupca 8" },
+  { id: "t9", src: "/testimonials/t9.webp", alt: "Razgovor kupca 9" },
 ];
 
 export default function Testimonials() {
