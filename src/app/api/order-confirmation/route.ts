@@ -1,4 +1,3 @@
-// app/api/order-confirmation/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
@@ -15,6 +14,7 @@ type Customer = {
   name: string;
   email: string;
   address: string;
+  phone?: string;
 };
 
 interface OrderPayload {
@@ -49,14 +49,24 @@ function isOrderPayload(x: unknown): x is OrderPayload {
   );
 }
 
+function toErrorMessage(e: unknown): string {
+  if (typeof e === "string") return e;
+  if (e && typeof e === "object" && "message" in e) {
+    const m = (e as { message?: unknown }).message;
+    if (typeof m === "string") return m;
+  }
+  try { return JSON.stringify(e); } catch { return "Unknown error"; }
+}
+
 const renderEmailHtml = (params: {
   orderId: string;
   customerName: string;
   items: OrderItem[];
   total: number;
   address: string;
+  phone?: string;
 }) => {
-  const { orderId, customerName, items, total, address } = params;
+  const { orderId, customerName, items, total, address, phone } = params;
 
   const itemsHtml = items
     .map(
@@ -84,6 +94,7 @@ const renderEmailHtml = (params: {
         </tfoot>
       </table>
       <p><strong>Adresa:</strong> ${address}</p>
+      ${phone ? `<p><strong>Telefon:</strong> ${phone}</p>` : ""}
       <hr style="margin:24px 0;border:none;border-top:1px solid #eee;" />
       <p style="font-size:12px;color:#666;">Kontakt: orders@dandafashion.rs</p>
     </div>`;
@@ -91,14 +102,13 @@ const renderEmailHtml = (params: {
 
 export async function POST(req: NextRequest) {
   try {
-    const raw = (await req.json()) as unknown;
+    const raw: unknown = await req.json();
 
-if (!isOrderPayload(raw)) {
-  return NextResponse.json({ ok: false, error: "Invalid payload" }, { status: 400 });
-}
+    if (!isOrderPayload(raw)) {
+      return NextResponse.json({ ok: false, error: "Invalid payload" }, { status: 400 });
+    }
 
-const { orderId, customer, items, total } = raw as OrderPayload;
-
+    const { orderId, customer, items, total } = raw;
 
     const html = renderEmailHtml({
       orderId,
@@ -106,27 +116,23 @@ const { orderId, customer, items, total } = raw as OrderPayload;
       items,
       total,
       address: customer.address,
+      phone: customer.phone,
     });
 
     const { error } = await resend.emails.send({
-  from: process.env.MAIL_FROM ?? "D&A Fashion <onboarding@resend.dev>",
-  to: [customer.email],                 // kupac
-  bcc: ["luka.xzy@gmail.com"],          // admin kopija (isti mejl)
-  subject: `Potvrda porudžbine #${orderId} – D&A Fashion`,
-  html,
-  // reply_to: ["orders@dandafashion.rs"], // opciono da ti stigne odgovor
-});
-
+      from: process.env.MAIL_FROM ?? "D&A Fashion <onboarding@resend.dev>",
+      to: [customer.email],
+      bcc: ["luka.xzy@gmail.com"],
+      subject: `Potvrda porudžbine #${orderId} – D&A Fashion`,
+      html,
+    });
 
     if (error) {
-      // nema 'any' u catch-u
-      return NextResponse.json({ ok: false, error: String(error) }, { status: 500 });
+      return NextResponse.json({ ok: false, error: toErrorMessage(error) }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
-    // umesto (e: any)
-    const message = e instanceof Error ? e.message : "Unknown error";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    return NextResponse.json({ ok: false, error: toErrorMessage(e) }, { status: 500 });
   }
 }
