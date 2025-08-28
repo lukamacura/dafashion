@@ -46,7 +46,6 @@ const [form, setForm] = useState({
   address: "",
   city: "",
   phone: "",
-  payment: "Pouzećem" as "Pouzećem" | "Kartica", // proširi po potrebi
 });
 
 const [errors, setErrors] = useState<Record<string, string>>({});
@@ -94,7 +93,6 @@ const handleCheckout = async () => {
         name: form.name,
         email: form.email,
         address: `${form.address}, ${form.city}`,
-        payment: form.payment,
         phone: form.phone,
       },
       items: items,
@@ -108,12 +106,12 @@ const handleCheckout = async () => {
     });
 
     const data = await res.json();
-    if (data.ok) {
-      alert("Porudžbina potvrđena! Proverite email.");
-      // TODO: isprazni korpu ili redirect na /thank-you
-    } else {
-      alert("Greška: " + data.error);
-    }
+if (data.ok) {
+  alert("Porudžbina potvrđena! Proverite email.");
+} else {
+  alert(String(data.error ?? "Došlo je do greške.")); // ⬅️ neće više biti [object Object]
+}
+
   } catch (err) {
     console.error(err);
     alert("Došlo je do greške. Pokušajte ponovo.");
@@ -131,6 +129,9 @@ const subtotal = useMemo(
   () => items.reduce((sum: number, it: CartItem) => sum + it.price * it.qty, 0),
   [items]
 );
+// ispod validate()
+const errorsNow = validate();
+const hasErrors = Object.keys(errorsNow).length > 0 || items.length === 0;
 
 
   // 💡 NOVO: besplatna dostava kada je totalQty >= 2 (npr. 2 ista proizvoda)
@@ -391,31 +392,17 @@ const subtotal = useMemo(
     />
     {errors.phone && <p className="text-xs text-red-400">{errors.phone}</p>}
 
-    {/* Payment opcije (primer) */}
-    <div className="flex gap-3 text-sm">
-      <label className="inline-flex items-center gap-2">
-        <input
-          type="radio"
-          name="payment"
-          checked={form.payment === "Pouzećem"}
-          onChange={() => setForm({ ...form, payment: "Pouzećem" })}
-        />
-        <span>Plaćanje pouzećem</span>
-      </label>
-      <label className="inline-flex items-center gap-2 opacity-60 cursor-not-allowed">
-        <input type="radio" name="payment" disabled />
-        <span>Kartica (uskoro)</span>
-      </label>
-    </div>
+    
   </form>
 
-  <button
-    onClick={handleCheckout}
-    disabled={items.length === 0}
-    className="mt-4 w-full btn-gradient text-[#151511] font-bold px-6 py-4 rounded-xl shadow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    Potvrdi porudžbinu
-  </button>
+<button
+  onClick={handleCheckout}
+  disabled={hasErrors}
+  className="mt-4 w-full btn-gradient text-[#151511] font-bold px-6 py-4 rounded-xl shadow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  Potvrdi porudžbinu
+</button>
+
 
   <p className="mt-3 text-center text-xs text-neutral-400">
     Dostava je besplatna za dve ili više stavki <em>(ukupna količina)</em>, inače {RSD(shippingFee)}.

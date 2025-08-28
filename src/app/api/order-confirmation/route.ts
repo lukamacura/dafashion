@@ -15,7 +15,6 @@ type Customer = {
   name: string;
   email: string;
   address: string;
-  payment: string;
 };
 
 interface OrderPayload {
@@ -37,7 +36,6 @@ function isOrderPayload(x: unknown): x is OrderPayload {
     typeof customer.name === "string" &&
     typeof customer.email === "string" &&
     typeof customer.address === "string" &&
-    typeof customer.payment === "string" &&
     Array.isArray(items) &&
     items.every((it) => {
       const i = it as Record<string, unknown>;
@@ -57,9 +55,8 @@ const renderEmailHtml = (params: {
   items: OrderItem[];
   total: number;
   address: string;
-  payment: string;
 }) => {
-  const { orderId, customerName, items, total, address, payment } = params;
+  const { orderId, customerName, items, total, address } = params;
 
   const itemsHtml = items
     .map(
@@ -87,7 +84,6 @@ const renderEmailHtml = (params: {
         </tfoot>
       </table>
       <p><strong>Adresa:</strong> ${address}</p>
-      <p><strong>Način plaćanja:</strong> ${payment}</p>
       <hr style="margin:24px 0;border:none;border-top:1px solid #eee;" />
       <p style="font-size:12px;color:#666;">Kontakt: orders@dandafashion.rs</p>
     </div>`;
@@ -110,7 +106,6 @@ const { orderId, customer, items, total } = raw as OrderPayload;
       items,
       total,
       address: customer.address,
-      payment: customer.payment,
     });
 
     const { error } = await resend.emails.send({
