@@ -154,6 +154,7 @@ export function DNAPopupCTALite({
 
             {/* CTA */}
             <Link
+            onClick={close}
               href={ctaHref}
               className="mt-6 sm:mt-8 inline-flex w-full sm:w-auto items-center justify-center
                          rounded-2xl px-6 sm:px-8 py-4 text-lg sm:text-xl font-satoshi font-semibold
