@@ -96,7 +96,6 @@ const renderEmailHtml = (params: {
       <p><strong>Adresa:</strong> ${address}</p>
       ${phone ? `<p><strong>Telefon:</strong> ${phone}</p>` : ""}
       <hr style="margin:24px 0;border:none;border-top:1px solid #eee;" />
-      <p style="font-size:12px;color:#666;">Kontakt: orders@dandafashion.rs</p>
     </div>`;
 };
 

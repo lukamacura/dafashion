@@ -77,7 +77,7 @@ export default function Hero() {
               width={300}
               height={300}
               sizes="(max-width: 768px) 38vw, 300px"
-              className="absolute left-1.5 sm:left-2 top-[-70px] md:-top-[70px] opacity-80 object-contain -rotate-6 z-[1]"
+              className="absolute left-1.5 sm:left-2 top-[200px] md:-top-[70px] opacity-80 object-contain -rotate-6 z-[1]"
               priority
             />
             {/* Desni t-shirt */}
@@ -87,7 +87,7 @@ export default function Hero() {
               width={320}
               height={320}
               sizes="(max-width: 768px) 40vw, 320px"
-              className="absolute right-1.5 sm:right-2 top-[-70px] md:-top-[70px] opacity-80 object-contain rotate-6 z-[1]"
+              className="absolute right-1.5 sm:right-2 top-[200px] md:-top-[70px] opacity-80 object-contain rotate-6 z-[1]"
               priority
             />
             {/* Sredina – telefoni */}

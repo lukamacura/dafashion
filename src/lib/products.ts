@@ -28,7 +28,7 @@ const PRICE = {
 
 // Zaokruži broj tako da se završava na 0 ili 5
 function roundTo0or5(n: number): number {
-  return Math.round(n / 5) * 5;
+  return Math.round(n / 100) * 100;
 }
 
 // Popust (40%) pa zaokruži na 0 ili 5
@@ -44,8 +44,9 @@ const S = (n = PRICE.SORC)    => ({ price: n, oldPrice: retailFromDiscount(n) })
 const T = (n: number)         => ({ price: n, oldPrice: retailFromDiscount(n) });
 
 /* ------------------ DEFAULT SIZES ------------------ */
+const SIZES_SHIRTS = ["S", "M", "L", "XL", "XXL"];
 const SIZES_TOPS = ["S", "M", "L", "XL"];
-const SIZES_PANTS = ["S", "M", "L", "XL"];
+const SIZES_PANTS = ["S", "M", "L", "XL", "XXL", "3XL"];
 const UNI = ["UNI"];
 
 /* ------------------ HELPERS ------------------ */
@@ -69,32 +70,32 @@ export const PRODUCTS: Product[] = [
   { id:"balmain-sorc", name:"Balmain šorc", brand:"Balmain", category:"Šorcevi", sizes:SIZES_PANTS, images:imgs("balmain-sorc",3), image:imgs("balmain-sorc",3)[0], href:href("balmain-sorc"), ...S() },
 
   // MAJICE
-  { id:"balmain-majica", name:"Balmain majica", brand:"Balmain", category:"Majice", sizes:SIZES_TOPS, images:imgs("balmain-majica",2), image:imgs("balmain-majica",2)[0], href:href("balmain-majica"), ...M() },
-  { id:"diesel-majica-tip1", name:"Diesel majica", brand:"Diesel", category:"Majice", sizes:SIZES_TOPS, images:imgs("diesel-majica-tip1",2), image:imgs("diesel-majica-tip1",2)[0], href:href("diesel-majica-tip1"), ...M() },
-  { id:"diesel-majica-tip2", name:"Diesel majica", brand:"Diesel", category:"Majice", sizes:SIZES_TOPS, images:imgs("diesel-majica-tip2",3), image:imgs("diesel-majica-tip2",3)[0], href:href("diesel-majica-tip2"), ...M() },
-  { id:"trapstar-majica-tamna", name:"Trapstar majica (tamna)", brand:"Trapstar", category:"Majice", sizes:SIZES_TOPS, images:imgs("trapstar-majica-tamna",4), image:imgs("trapstar-majica-tamna",4)[0], href:href("trapstar-majica-tamna"), ...M() },
-  { id:"trapstar-majica-bela", name:"Trapstar majica (bela)", brand:"Trapstar", category:"Majice", sizes:SIZES_TOPS, images:imgs("trapstar-majica-bela",2), image:imgs("trapstar-majica-bela",2)[0], href:href("trapstar-majica-bela"), ...M() },
+  { id:"balmain-majica", name:"Balmain majica", brand:"Balmain", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("balmain-majica",2), image:imgs("balmain-majica",2)[0], href:href("balmain-majica"), ...M() },
+  { id:"diesel-majica-tip1", name:"Diesel majica", brand:"Diesel", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("diesel-majica-tip1",2), image:imgs("diesel-majica-tip1",2)[0], href:href("diesel-majica-tip1"), ...M() },
+  { id:"diesel-majica-tip2", name:"Diesel majica", brand:"Diesel", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("diesel-majica-tip2",3), image:imgs("diesel-majica-tip2",3)[0], href:href("diesel-majica-tip2"), ...M() },
+  { id:"trapstar-majica-tamna", name:"Trapstar majica (tamna)", brand:"Trapstar", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("trapstar-majica-tamna",4), image:imgs("trapstar-majica-tamna",4)[0], href:href("trapstar-majica-tamna"), ...M() },
+  { id:"trapstar-majica-bela", name:"Trapstar majica (bela)", brand:"Trapstar", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("trapstar-majica-bela",2), image:imgs("trapstar-majica-bela",2)[0], href:href("trapstar-majica-bela"), ...M() },
 
 // ——— HUGO (compact, 1 linija po proizvodu) ———
-{ id:"hugo-majica-bela", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-bela",2), image:imgs("hugo-majica-bela",4)[0], href:href("hugo-majica-bela"), ...M() },
-{ id:"hugo-majica-tamna", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-tamna",2), image:imgs("hugo-majica-tamna",2)[0], href:href("hugo-majica-tamna"), ...M() },
-{ id:"hugo-majica-crvena", name:"HUGO majica (crvena)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-crvena",2), image:imgs("hugo-majica-crvena",2)[0], href:href("hugo-majica-crvena"), ...M() },
-{ id:"hugo-majica-plava", name:"HUGO majica (plava)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-plava",2), image:imgs("hugo-majica-plava",2)[0], href:href("hugo-majica-plava"), ...M() },
-{ id:"hugo-majica-svetla", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-svetla",2), image:imgs("hugo-majica-svetla",2)[0], href:href("hugo-majica-svetla"), ...M() },
-{ id:"hugo-majica-tamna-mali", name:"HUGO majica (crna – pisani logo)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-tamna-mali",2), image:imgs("hugo-majica-tamna-mali",2)[0], href:href("hugo-majica-tamna-mali"), ...M() },
-{ id:"hugo-majica-natpis-tamna", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-natpis-tamna",2), image:imgs("hugo-majica-natpis-tamna",2)[0], href:href("hugo-majica-natpis-tamna"), ...M() },
-{ id:"hugo-majica-natpis-bela", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-natpis-bela",1), image:imgs("hugo-majica-natpis-bela",1)[0], href:href("hugo-majica-natpis-bela"), ...M() },
-{ id:"hugo-majica-kisa", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-kisa",2), image:imgs("hugo-majica-kisa",2)[0], href:href("hugo-majica-kisa"), ...M() },
-{ id:"hugo-majica", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica",1), image:imgs("hugo-majica",1)[0], href:href("hugo-majica"), ...M() },
-{ id:"hugo-majica-big", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_TOPS, images:imgs("hugo-majica-big",1), image:imgs("hugo-majica-big",1)[0], href:href("hugo-majica-big"), ...M() },
+{ id:"hugo-majica-bela", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-bela",2), image:imgs("hugo-majica-bela",4)[0], href:href("hugo-majica-bela"), ...M() },
+{ id:"hugo-majica-tamna", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-tamna",2), image:imgs("hugo-majica-tamna",2)[0], href:href("hugo-majica-tamna"), ...M() },
+{ id:"hugo-majica-crvena", name:"HUGO majica (crvena)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-crvena",2), image:imgs("hugo-majica-crvena",2)[0], href:href("hugo-majica-crvena"), ...M() },
+{ id:"hugo-majica-plava", name:"HUGO majica (plava)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-plava",2), image:imgs("hugo-majica-plava",2)[0], href:href("hugo-majica-plava"), ...M() },
+{ id:"hugo-majica-svetla", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-svetla",2), image:imgs("hugo-majica-svetla",2)[0], href:href("hugo-majica-svetla"), ...M() },
+{ id:"hugo-majica-tamna-mali", name:"HUGO majica (crna – pisani logo)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-tamna-mali",2), image:imgs("hugo-majica-tamna-mali",2)[0], href:href("hugo-majica-tamna-mali"), ...M() },
+{ id:"hugo-majica-natpis-tamna", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-natpis-tamna",2), image:imgs("hugo-majica-natpis-tamna",2)[0], href:href("hugo-majica-natpis-tamna"), ...M() },
+{ id:"hugo-majica-natpis-bela", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-natpis-bela",1), image:imgs("hugo-majica-natpis-bela",1)[0], href:href("hugo-majica-natpis-bela"), ...M() },
+{ id:"hugo-majica-kisa", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-kisa",2), image:imgs("hugo-majica-kisa",2)[0], href:href("hugo-majica-kisa"), ...M() },
+{ id:"hugo-majica", name:"HUGO majica (crna)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica",1), image:imgs("hugo-majica",1)[0], href:href("hugo-majica"), ...M() },
+{ id:"hugo-majica-big", name:"HUGO majica (bela)", brand:"HUGO", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("hugo-majica-big",1), image:imgs("hugo-majica-big",1)[0], href:href("hugo-majica-big"), ...M() },
 
-  { id:"boss-majica", name:"BOSS majica", brand:"BOSS", category:"Majice", sizes:SIZES_TOPS, images:imgs("boss-majica",2), image:imgs("boss-majica",2)[0], href:href("boss-majica"), ...M() },
-  { id:"amiri-majica", name:"AMIRI majica", brand:"AMIRI", category:"Majice", sizes:SIZES_TOPS, images:imgs("amiri-majica",3), image:imgs("amiri-majica",3)[0], href:href("amiri-majica"), ...M() },
-  { id:"dsquared-majica", name:"Dsquared2 majica", brand:"Dsquared2", category:"Majice", sizes:SIZES_TOPS, images:imgs("dsquared-majica",2), image:imgs("dsquared-majica",2)[0], href:href("dsquared-majica"), ...M() },
+  { id:"boss-majica", name:"BOSS majica", brand:"BOSS", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("boss-majica",2), image:imgs("boss-majica",2)[0], href:href("boss-majica"), ...M() },
+  { id:"amiri-majica", name:"AMIRI majica", brand:"AMIRI", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("amiri-majica",3), image:imgs("amiri-majica",3)[0], href:href("amiri-majica"), ...M() },
+  { id:"dsquared-majica", name:"Dsquared2 majica", brand:"Dsquared2", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("dsquared-majica",2), image:imgs("dsquared-majica",2)[0], href:href("dsquared-majica"), ...M() },
 
-  { id:"prada-majica-tamna", name:"Prada majica (tamna)", brand:"Prada", category:"Majice", sizes:SIZES_TOPS, images:imgs("prada-majica-tamna",6), image:imgs("prada-majica-tamna",6)[0], href:href("prada-majica-tamna"), ...M() },
-  { id:"prada-majica-svetla", name:"Prada majica (svetla)", brand:"Prada", category:"Majice", sizes:SIZES_TOPS, images:imgs("prada-majica-svetla",2), image:imgs("prada-majica-svetla",2)[0], href:href("prada-majica-svetla"), ...M() },
-  { id:"polo-majica", name:"Polo Ralph Lauren majica", brand:"Polo Ralph Lauren", category:"Majice", sizes:SIZES_TOPS, images:imgs("polo-majica",2), image:imgs("polo-majica",2)[0], href:href("polo-majica"), ...M() },
+  { id:"prada-majica-tamna", name:"Prada majica (tamna)", brand:"Prada", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("prada-majica-tamna",6), image:imgs("prada-majica-tamna",6)[0], href:href("prada-majica-tamna"), ...M() },
+  { id:"prada-majica-svetla", name:"Prada majica (svetla)", brand:"Prada", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("prada-majica-svetla",2), image:imgs("prada-majica-svetla",2)[0], href:href("prada-majica-svetla"), ...M() },
+  { id:"polo-majica", name:"Polo Ralph Lauren majica", brand:"Polo Ralph Lauren", category:"Majice", sizes:SIZES_SHIRTS, images:imgs("polo-majica",2), image:imgs("polo-majica",2)[0], href:href("polo-majica"), ...M() },
 
   // TORBICE
   { id:"lv-torbica", name:"Louis Vuitton torbica", brand:"Louis Vuitton", category:"Torbice", sizes:UNI, images:imgs("lv-torbica",1), image:imgs("lv-torbica",1)[0], href:href("lv-torbica"), ...T(PRICE.TORBICA.LV) },
